@@ -248,6 +248,7 @@ taklif etamiz</p>
               class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm h-10 px-4 w-full text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               style="background: linear-gradient(to right, rgb(166,125,43), rgb(90,15,27)); border: none;">Javob yuborish</button>
             <p class="sgx-body" id="rsvp-done" hidden data-i18n="rsvp.done" style="color:#a67d2b;font-size:.95rem;">Rahmat! Javobingiz qabul qilindi.</p>
+            <p class="sgx-body" id="rsvp-error" hidden data-i18n="rsvp.error" style="color:#a3423c;font-size:.95rem;">Yuborib bo'lmadi. Keyinroq urinib ko'ring.</p>
           </form>
         </div>
       </div>
@@ -292,6 +293,7 @@ taklif etamiz</p>
         </div>
 
         <p class="sgx-body wish-empty" id="wish-empty" hidden data-i18n="wish.empty">Hozircha tilaklar yo'q — birinchi bo'ling!</p>
+        <p class="sgx-body wish-empty" id="wish-error" hidden data-i18n="wish.error" style="color:#a3423c;">Yuborib bo'lmadi. Keyinroq urinib ko'ring.</p>
         <ul class="sgx-wishes" id="wish-list"></ul>
         <button type="button" class="wish-more" id="wish-more" hidden data-i18n="wish.more">Yana ko'rsatish</button>
       </div>
@@ -362,6 +364,8 @@ taklif etamiz</p>
       'wish.send':     "Xabar yuborish",
       'wish.more':     "Yana ko'rsatish",
       'wish.empty':    "Hozircha tilaklar yo'q — birinchi bo'ling!",
+      'wish.error':    "Yuborib bo'lmadi. Keyinroq urinib ko'ring.",
+      'rsvp.error':    "Yuborib bo'lmadi. Keyinroq urinib ko'ring.",
       'closing.text':  "Sizni ko'rishdan baxtiyor bo'lamiz!",
       'closing.names': "Dilshodbek va Nilufar",
       'bgm.play':      "Musiqani boshlash",
@@ -414,6 +418,8 @@ taklif etamiz</p>
       'wish.send':     "Отправить",
       'wish.more':     "Показать ещё",
       'wish.empty':    "Пожеланий пока нет — будьте первым!",
+      'wish.error':    "Не удалось отправить. Попробуйте позже.",
+      'rsvp.error':    "Не удалось отправить. Попробуйте позже.",
       'closing.text':  "Будем счастливы видеть вас!",
       'closing.names': "Dilshodbek и Nilufar",
       'bgm.play':      "Включить музыку",
@@ -576,32 +582,44 @@ taklif etamiz</p>
   /* ------------------------------------------------------------------ *
    * 7. Guestbook: submit adds an entry, entries persist and load in pages
    * ------------------------------------------------------------------ */
-  var STORE = 'sgx-wishes';
+  var API_WISHES = '/api/wishes';
+  var API_RSVP   = '/api/rsvp';
+  var STORE = 'sgx-wishes';   // fallback store, used only when the API is unreachable
   var PAGE  = 3;
+
   var listEl  = document.getElementById('wish-list');
   var moreEl  = document.getElementById('wish-more');
   var emptyEl = document.getElementById('wish-empty');
+  var errEl   = document.getElementById('wish-error');
   var shown   = PAGE;
+  var wishes  = [];
+  var offline = false;        // true once a read from the API has failed
 
-  function loadWishes() {
-    try { return JSON.parse(localStorage.getItem(STORE)) || []; }
-    catch (e) { return []; }
+  function localLoad() {
+    try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch (e) { return []; }
   }
-  function saveWishes(list) {
+  function localSave(list) {
     try { localStorage.setItem(STORE, JSON.stringify(list)); } catch (e) {}
   }
 
-  function renderWishes(freshId) {
-    var all = loadWishes();
-    listEl.textContent = '';
-    emptyEl.hidden = all.length > 0;
+  function fetchWishes() {
+    return fetch(API_WISHES, { headers: { Accept: 'application/json' } })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) { offline = false; wishes = d.wishes || []; })
+      .catch(function () { offline = true; wishes = localLoad(); });
+  }
 
-    all.slice(0, shown).forEach(function (w) {
+  function renderWishes(freshId) {
+    if (!listEl) return;
+    listEl.textContent = '';
+    emptyEl.hidden = wishes.length > 0;
+
+    wishes.slice(0, shown).forEach(function (w) {
       var li = document.createElement('li');
       li.className = 'sgx-wish' + (w.id === freshId ? ' sgx-wish--new' : '');
       var msg = document.createElement('p');
       msg.className = 'sgx-wish__msg';
-      msg.textContent = w.msg;                    // textContent -> no HTML injection
+      msg.textContent = w.msg;                  // textContent -> no HTML injection
       var who = document.createElement('p');
       who.className = 'sgx-wish__who';
       who.textContent = '— ' + w.name;
@@ -610,8 +628,8 @@ taklif etamiz</p>
       listEl.appendChild(li);
     });
 
-    moreEl.hidden = all.length <= shown;
-    moreEl.textContent = t('wish.more') + ' (' + Math.max(0, all.length - shown) + ')';
+    moreEl.hidden = wishes.length <= shown;
+    moreEl.textContent = t('wish.more') + ' (' + Math.max(0, wishes.length - shown) + ')';
   }
 
   moreEl.addEventListener('click', function () { shown += PAGE; renderWishes(); });
@@ -620,27 +638,71 @@ taklif etamiz</p>
     e.preventDefault();
     var nameEl = document.getElementById('wish-name');
     var msgEl  = document.getElementById('wish-msg');
+    var btnEl  = e.target.querySelector('button[type="submit"]');
     var name = nameEl.value.trim();
     var msg  = msgEl.value.trim();
     if (!name || !msg) return;
 
-    var id  = Date.now();
-    var all = loadWishes();
-    all.unshift({ id: id, name: name, msg: msg, at: new Date().toISOString() });
-    saveWishes(all);
+    errEl.hidden = true;
+    btnEl.disabled = true;
 
-    nameEl.value = '';
-    msgEl.value  = '';
-    renderWishes(id);
-    if (listEl.firstElementChild) {
-      listEl.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    fetch(API_WISHES, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, msg: msg })
+    })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) {
+        wishes.unshift(d.wish);
+        nameEl.value = '';
+        msgEl.value  = '';
+        renderWishes(d.wish.id);
+      })
+      .catch(function () {
+        if (offline) {                          // no API here - keep it in the browser
+          var w = { id: Date.now(), name: name, msg: msg };
+          var all = localLoad();
+          all.unshift(w);
+          localSave(all);
+          wishes = all;
+          nameEl.value = '';
+          msgEl.value  = '';
+          renderWishes(w.id);
+        } else {
+          errEl.hidden = false;
+        }
+      })
+      .then(function () { btnEl.disabled = false; });
   });
 
-  /* RSVP — no backend in this static copy, so just acknowledge */
+  fetchWishes().then(function () { renderWishes(); });
+
+  /* RSVP */
   document.getElementById('rsvp-form').addEventListener('submit', function (e) {
     e.preventDefault();
-    document.getElementById('rsvp-done').hidden = false;
+    var name   = document.getElementById('rsvp-name').value.trim();
+    var picked = document.querySelector('input[name="attend"]:checked');
+    var doneEl = document.getElementById('rsvp-done');
+    var failEl = document.getElementById('rsvp-error');
+    var btnEl  = e.target.querySelector('button[type="submit"]');
+
+    doneEl.hidden = true;
+    failEl.hidden = true;
+    if (!name || !picked) { failEl.hidden = false; return; }
+
+    btnEl.disabled = true;
+    fetch(API_RSVP, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        attending: picked.value,
+        message: document.getElementById('rsvp-msg').value.trim()
+      })
+    })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); doneEl.hidden = false; })
+      .catch(function () { failEl.hidden = false; })
+      .then(function () { btnEl.disabled = false; });
   });
 
   applyLang();

@@ -1,0 +1,9 @@
+{
+  "name": "taklifnoma",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static wedding invitation page with Neon-backed guestbook and RSVP",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}
