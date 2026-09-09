@@ -8,13 +8,22 @@
   <link rel="stylesheet" href="./assets/index.css">
   <title>Dilshodbek &amp; Nilufar — Taklifnoma</title>
   <style>
+    /* The UA [hidden] rule does not reliably reach SVG elements, so state the
+       rule explicitly - without it the play triangle stays on screen while the
+       track is running. */
+    [hidden] { display: none !important; }
+    /* `hidden` is an HTMLElement property - SVGElement does not have it, so
+       assigning svg.hidden only makes a JS expando and never touches the
+       attribute. Drive the icons with a class instead. */
+    #bgm-btn .bgm-ico { display: none; }
+    #bgm-btn .bgm-ico.is-on { display: block; }
     /* equalizer bars for the music button (matches the original bundle) */
     @keyframes azamatBar { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
-    .bgm-bars { display: none; align-items: flex-end; gap: 2px; height: 16px; }
+    .bgm-bars { display: none; align-items: flex-end; gap: 3px; height: 20px; }
     .bgm-bars.is-on { display: flex; }
     .bgm-bars span {
       width: 3px; border-radius: 999px; transform-origin: bottom;
-      background: #f9f0e0;
+      background: linear-gradient(to top, #5a0f1b, #b48c3d);
       animation-name: azamatBar; animation-timing-function: ease-in-out;
       animation-iteration-count: infinite; animation-direction: alternate;
     }
@@ -32,7 +41,6 @@
       transition: background .25s ease, color .25s ease;
     }
     .wish-more:hover { background: #a67d2b; color: #f9f0e0; }
-    .wish-more[hidden], .wish-empty[hidden] { display: none; }
     .wish-empty { margin-top: 1rem; color: #846f61; font-style: italic; opacity: .8; }
   </style>
 </head>
@@ -46,17 +54,21 @@
     <button type="button" id="bgm-btn" data-i18n-aria="bgm.play" aria-label="Musiqani boshlash"
       class="w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-150 active:scale-90 focus:outline-none"
       style="background: linear-gradient(135deg, rgb(90,15,27) 0%, rgb(166,125,43) 100%); box-shadow: rgba(166,125,43,0.45) 0px 2px 12px;">
-      <svg id="bgm-icon-play" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg id="bgm-icon-play" class="bgm-ico is-on" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M2 1.5L12.5 8L2 14.5V1.5Z" fill="#f9f0e0"></path>
       </svg>
-      <span class="bgm-bars" id="bgm-bars" aria-hidden="true">
-        <span style="height:60%;  animation-duration:.55s; animation-delay:0s;"></span>
-        <span style="height:100%; animation-duration:.65s; animation-delay:.08s;"></span>
-        <span style="height:75%;  animation-duration:.75s; animation-delay:.16s;"></span>
-        <span style="height:100%; animation-duration:.85s; animation-delay:.24s;"></span>
-        <span style="height:50%;  animation-duration:.95s; animation-delay:.32s;"></span>
-      </span>
+      <svg id="bgm-icon-pause" class="bgm-ico" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="4" height="14" rx="1.5" fill="#f9f0e0"></rect>
+        <rect x="9" y="1" width="4" height="14" rx="1.5" fill="#f9f0e0"></rect>
+      </svg>
     </button>
+    <div class="bgm-bars" id="bgm-bars" aria-hidden="true">
+      <span style="height:60%;  animation-duration:.55s; animation-delay:0s;"></span>
+      <span style="height:100%; animation-duration:.65s; animation-delay:.08s;"></span>
+      <span style="height:75%;  animation-duration:.75s; animation-delay:.16s;"></span>
+      <span style="height:100%; animation-duration:.85s; animation-delay:.24s;"></span>
+      <span style="height:50%;  animation-duration:.95s; animation-delay:.32s;"></span>
+    </div>
   </div>
 
   <nav class="sgx-langs" aria-label="Language">
@@ -543,6 +555,7 @@ taklif etamiz</p>
    * ------------------------------------------------------------------ */
   var btn      = document.getElementById('bgm-btn');
   var iconPlay = document.getElementById('bgm-icon-play');
+  var iconStop = document.getElementById('bgm-icon-pause');
   var bars     = document.getElementById('bgm-bars');
 
   function syncPlayerLabel() {
@@ -550,8 +563,9 @@ taklif etamiz</p>
   }
   function syncPlayer() {
     var on = !audio.paused;
-    iconPlay.hidden = on;                 // playing -> equalizer, stopped -> triangle
-    bars.classList.toggle('is-on', on);
+    iconPlay.classList.toggle('is-on', !on);  // stopped -> triangle in the button
+    iconStop.classList.toggle('is-on', on);   // playing -> pause bars in the button
+    bars.classList.toggle('is-on', on);       // ...plus the equalizer beside it
     syncPlayerLabel();
   }
   function play() { audio.volume = 0.5; var p = audio.play(); if (p) p.catch(function () {}); }
