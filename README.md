@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Taklifnoma — static copy
 
-## Getting Started
+Статическая (offline) копия страницы-приглашения
+`https://taklif-link.uz/wedding/bunyod-nazokat`.
 
-First, run the development server:
+Оригинал — SPA на Vite + React: сервер отдаёт пустой `<div id="root">`, вся
+разметка собирается в браузере. Здесь сохранён уже отрендеренный DOM плюс
+оригинальный CSS-бандл, поэтому страница работает без JS-фреймворка.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Структура
+
+```
+index.html          рендер-DOM + скрипт поведения (~22 KB)
+assets/index.css    оригинальный CSS-бандл, 41 @keyframes (~310 KB)
+sacred/             декор темы «sacred»: конверт, печать, букеты,
+                    лепестки, углы, рваные края бумаги
+uploads/            фотографии галереи + фоновая музыка
+_source-reference/  original-app-bundle.js — исходный React-бандл сайта,
+                    только для справки, страницей не используется
+vercel.json         статический деплой, без билда
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Анимации
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| механика | как включается |
+|---|---|
+| открытие конверта | `.sgx-cover` → `.is-opening` (scale + fade) → `.is-gone` |
+| проявление страницы | `.sgx--revealed .sgx-main { opacity: 1 }` |
+| reveal при скролле | `.sgx-reveal` → `.is-visible`, через `IntersectionObserver`, лесенкой по `transition-delay` |
+| стрелка «вниз» | `@keyframes sgx-chev` |
+| лепестки, дрейф, шиммер | `@keyframes ivx-fall`, `ivx-drift-a/b/c`, `ivx-bob`, `ivx-shimmer`, `ivx-sway-l/r` |
+| роза, едущая по таймлайну | CSS-переменные `--sgx-rose-top/-span/-y/-len`, пересчёт на скролле |
+| обратный отсчёт | JS, цель `2026-12-20T18:00:00+05:00` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Локальный запуск
 
-## Learn More
+```bash
+python -m http.server 8080
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Замечание
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Вёрстка, CSS-бандл и графика принадлежат сервису taklif-link.uz;
+фотографии и текст — приглашению конкретной пары. Копия сделана для
+изучения и не предназначена для выдачи за оригинал.
