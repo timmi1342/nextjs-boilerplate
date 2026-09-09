@@ -6,21 +6,34 @@
   <link rel="icon" type="image/png" href="./favicon.png">
   <meta name="theme-color" content="#1e3a8a">
   <link rel="stylesheet" href="./assets/index.css">
-  <title>Bunyod &amp; Nazokat — Taklifnoma</title>
-  <style id="bgmp-slider-style">
-  .slider::-webkit-slider-thumb {
-    appearance: none; height: 12px; width: 12px; border-radius: 50%;
-    background: var(--bgmp-thumb, #D4AF76); cursor: pointer;
-    border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  .slider::-moz-range-thumb {
-    height: 12px; width: 12px; border-radius: 50%;
-    background: var(--bgmp-thumb, #D4AF76); cursor: pointer;
-    border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  </style>
+  <title>Dilshodbek &amp; Nilufar — Taklifnoma</title>
   <style>
+    /* equalizer bars for the music button (matches the original bundle) */
     @keyframes azamatBar { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
+    .bgm-bars { display: none; align-items: flex-end; gap: 2px; height: 16px; }
+    .bgm-bars.is-on { display: flex; }
+    .bgm-bars span {
+      width: 3px; border-radius: 999px; transform-origin: bottom;
+      background: #f9f0e0;
+      animation-name: azamatBar; animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite; animation-direction: alternate;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bgm-bars span { animation: none; transform: scaleY(.7); }
+    }
+    /* guestbook */
+    .sgx-wish--new { animation: wishIn .5s ease both; }
+    @keyframes wishIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .wish-more {
+      margin: 1.2rem auto 0; display: block; background: none; cursor: pointer;
+      border: 1px solid rgba(166,125,43,.45); border-radius: 999px;
+      padding: .5rem 1.4rem; color: #a67d2b;
+      font-size: .74rem; letter-spacing: .18em; text-transform: uppercase;
+      transition: background .25s ease, color .25s ease;
+    }
+    .wish-more:hover { background: #a67d2b; color: #f9f0e0; }
+    .wish-more[hidden], .wish-empty[hidden] { display: none; }
+    .wish-empty { margin-top: 1rem; color: #846f61; font-style: italic; opacity: .8; }
   </style>
 </head>
 <body>
@@ -28,29 +41,38 @@
 
   <audio id="bgm" src="./uploads/music-dzKDZ2JQY6eje3G2atDVy.mp3" preload="auto" loop playsinline></audio>
 
+  <!-- MUSIC PLAYER -->
   <div class="fixed bottom-20 right-4 z-[130] flex items-center gap-2 select-none">
-    <button type="button" id="bgm-btn" aria-label="Musiqani boshlash"
+    <button type="button" id="bgm-btn" data-i18n-aria="bgm.play" aria-label="Musiqani boshlash"
       class="w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-150 active:scale-90 focus:outline-none"
       style="background: linear-gradient(135deg, rgb(90,15,27) 0%, rgb(166,125,43) 100%); box-shadow: rgba(166,125,43,0.45) 0px 2px 12px;">
-      <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 1.5L12.5 8L2 14.5V1.5Z" fill="#f9f0e0"></path></svg>
+      <svg id="bgm-icon-play" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 1.5L12.5 8L2 14.5V1.5Z" fill="#f9f0e0"></path>
+      </svg>
+      <span class="bgm-bars" id="bgm-bars" aria-hidden="true">
+        <span style="height:60%;  animation-duration:.55s; animation-delay:0s;"></span>
+        <span style="height:100%; animation-duration:.65s; animation-delay:.08s;"></span>
+        <span style="height:75%;  animation-duration:.75s; animation-delay:.16s;"></span>
+        <span style="height:100%; animation-duration:.85s; animation-delay:.24s;"></span>
+        <span style="height:50%;  animation-duration:.95s; animation-delay:.32s;"></span>
+      </span>
     </button>
   </div>
 
   <nav class="sgx-langs" aria-label="Language">
-    <button type="button" class="sgx-lang is-active" aria-pressed="true">UZ</button>
-    <button type="button" class="sgx-lang " aria-pressed="false">EN</button>
-    <button type="button" class="sgx-lang " aria-pressed="false">RU</button>
+    <button type="button" class="sgx-lang is-active" data-lang="uz" aria-pressed="true">UZ</button>
+    <button type="button" class="sgx-lang" data-lang="ru" aria-pressed="false">RU</button>
   </nav>
 
   <!-- ENVELOPE / COVER -->
-  <div class="sgx-cover  " id="sgx-cover" role="button" tabindex="0" aria-label="Ochish uchun bosing">
+  <div class="sgx-cover" id="sgx-cover" role="button" tabindex="0" data-i18n-aria="cover.cta" aria-label="Ochish uchun bosing">
     <div class="sgx-cover__art">
       <div class="sgx-cover__seal">
-        <span class="sgx-mono"><span class="sgx-mono__letter">B</span><span class="sgx-mono__amp">&amp;</span><span class="sgx-mono__letter">N</span></span>
+        <span class="sgx-mono"><span class="sgx-mono__letter">D</span><span class="sgx-mono__amp">&amp;</span><span class="sgx-mono__letter">N</span></span>
       </div>
       <p class="sgx-cover__cta">
         <span class="sgx-cover__chev" aria-hidden="true">︿</span>
-        <span class="sgx-cover__label">Ochish uchun bosing</span>
+        <span class="sgx-cover__label" data-i18n="cover.cta">Ochish uchun bosing</span>
       </p>
     </div>
   </div>
@@ -60,15 +82,16 @@
     <!-- HERO -->
     <section class="sgx-hero">
       <div class="sgx-hero__monogram" aria-hidden="true">
-        <span class="sgx-mono"><span class="sgx-mono__letter">B</span><span class="sgx-mono__amp">&amp;</span><span class="sgx-mono__letter">N</span></span>
+        <span class="sgx-mono"><span class="sgx-mono__letter">D</span><span class="sgx-mono__amp">&amp;</span><span class="sgx-mono__letter">N</span></span>
       </div>
-      <p class="sgx-hero__kicker">Nikoh kuni</p>
+      <p class="sgx-hero__kicker" data-i18n="hero.kicker">Nikoh kuni</p>
       <p class="sgx-hero__date"><span>20.12.26</span><span class="sgx-hero__time">18:00</span></p>
+      <!-- names are never translated -->
       <h1 class="sgx-hero__names">
-        <span class="sgx-hero__name">Bunyod</span><span class="sgx-hero__amp">&amp;</span><span class="sgx-hero__name">Nazokat</span>
+        <span class="sgx-hero__name">Dilshodbek</span><span class="sgx-hero__amp">&amp;</span><span class="sgx-hero__name">Nilufar</span>
       </h1>
       <a class="sgx-scroll" href="#sgx-blessing">
-        <span class="sgx-scroll__text">Pastga suring</span>
+        <span class="sgx-scroll__text" data-i18n="hero.scroll">Pastga suring</span>
         <span class="sgx-scroll__chev" aria-hidden="true">﹀</span>
       </a>
       <img class="sgx-bouquet sgx-bouquet--l" src="./sacred/bouquet-left.webp" alt="" aria-hidden="true">
@@ -81,9 +104,13 @@
       <img class="sgx-vine sgx-vine--tr" src="./sacred/corner-tr.webp" alt="" aria-hidden="true">
       <div class="sgx-inner sgx-reveal" style="transition-delay: 0ms;">
         <p class="sgx-basmala">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
-        <div class="sgx-verse"><span>Ikki qalb</span><span>Bitta taqdir</span><span>Alloh yozgan umr</span></div>
-        <p class="sgx-body" style="white-space: pre-line;">Sizni nikoh to'yimiz munosabati bilan 
-bo'lib o'tadigan "Visol oqshomiga" ga 
+        <div class="sgx-verse">
+          <span data-i18n="verse.1">Ikki qalb</span>
+          <span data-i18n="verse.2">Bitta taqdir</span>
+          <span data-i18n="verse.3">Alloh yozgan umr</span>
+        </div>
+        <p class="sgx-body" style="white-space: pre-line;" data-i18n="invite.text">Sizni nikoh to'yimiz munosabati bilan
+bo'lib o'tadigan "Visol oqshomiga" ga
 taklif etamiz</p>
       </div>
     </section>
@@ -91,12 +118,12 @@ taklif etamiz</p>
     <!-- COUNTDOWN -->
     <section class="sgx-band sgx-band--cream">
       <div class="sgx-inner sgx-reveal" style="transition-delay: 70ms;">
-        <h2 class="sgx-script">Bayramgacha qoldi</h2>
+        <h2 class="sgx-script" data-i18n="count.title">Bayramgacha qoldi</h2>
         <div class="sgx-count" id="sgx-count" role="timer" aria-live="polite">
-          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="days">101</span><span class="sgx-count__lbl">Kun</span></div>
-          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="hours">18</span><span class="sgx-count__lbl">Soat</span></div>
-          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="mins">12</span><span class="sgx-count__lbl">Daqiqa</span></div>
-          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="secs">59</span><span class="sgx-count__lbl">Soniya</span></div>
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="days">0</span><span class="sgx-count__lbl" data-i18n="count.days">Kun</span></div>
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="hours">00</span><span class="sgx-count__lbl" data-i18n="count.hours">Soat</span></div>
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="mins">00</span><span class="sgx-count__lbl" data-i18n="count.mins">Daqiqa</span></div>
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="secs">00</span><span class="sgx-count__lbl" data-i18n="count.secs">Soniya</span></div>
         </div>
       </div>
     </section>
@@ -106,16 +133,16 @@ taklif etamiz</p>
       <div class="sgx-inner sgx-reveal" style="transition-delay: 140ms;">
         <div class="sgx-sched-head">
           <img src="./sacred/flourish-left.webp" alt="" aria-hidden="true">
-          <h2 class="sgx-script">Kun tartibi</h2>
+          <h2 class="sgx-script" data-i18n="sched.title">Kun tartibi</h2>
           <img src="./sacred/flourish-right.webp" alt="" aria-hidden="true">
         </div>
-        <div class="sgx-sched-wrap" id="sgx-sched-wrap" style="--sgx-rose-top: 28.14px; --sgx-rose-span: 204.33px; --sgx-rose-y: 232.47px; --sgx-rose-len: 204.33px;">
+        <div class="sgx-sched-wrap" id="sgx-sched-wrap">
           <ol class="sgx-sched">
-            <li class="sgx-sched__row"><span class="sgx-sched__time">18:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label">Mehmonlarni kutib olish</span></li>
-            <li class="sgx-sched__row"><span class="sgx-sched__time">19:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label">Nikoh marosimi</span></li>
-            <li class="sgx-sched__row"><span class="sgx-sched__time">20:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label">Tabriklar</span></li>
-            <li class="sgx-sched__row"><span class="sgx-sched__time">21:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label">Kechki ziyofat</span></li>
-            <li class="sgx-sched__row"><span class="sgx-sched__time">22:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label">Raqs va musiqa</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">18:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.1">Mehmonlarni kutib olish</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">19:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.2">Nikoh marosimi</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">20:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.3">Tabriklar</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">21:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.4">Kechki ziyofat</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">22:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.5">Raqs va musiqa</span></li>
           </ol>
           <span class="sgx-sched__spine" aria-hidden="true"></span>
           <span class="sgx-sched__trail" aria-hidden="true"></span>
@@ -133,13 +160,13 @@ taklif etamiz</p>
       <img class="sgx-petal sgx-petal--e" src="./sacred/petal-3138.webp" alt="" aria-hidden="true">
       <img class="sgx-petal sgx-petal--f" src="./sacred/petal-3034.webp" alt="" aria-hidden="true">
       <div class="sgx-inner sgx-reveal" style="transition-delay: 210ms;">
-        <h2 class="sgx-script">Manzil</h2>
+        <h2 class="sgx-script" data-i18n="venue.title">Manzil</h2>
         <img class="sgx-divider" src="./sacred/divider.webp" alt="" aria-hidden="true">
-        <p class="sgx-venue">VERSAL to'yxonasi</p>
-        <p class="sgx-address">Beruniy shoh ko'chasi 8A, Toshkent</p>
+        <p class="sgx-venue" data-i18n="venue.name">VERSAL to'yxonasi</p>
+        <p class="sgx-address" data-i18n="venue.address">Beruniy shoh ko'chasi 8A, Toshkent</p>
         <div class="sgx-maps">
-          <a class="sgx-btn sgx-btn--solid" href="https://www.google.com/maps/search/?api=1&amp;query=41.3282599%2C69.2248441" target="_blank" rel="noreferrer">Google Maps</a>
-          <a class="sgx-btn" href="https://yandex.uz/maps/?ll=69.2248441%2C41.3282599&amp;z=17&amp;pt=69.2248441%2C41.3282599%2Cpm2rdm" target="_blank" rel="noreferrer">Yandex xarita</a>
+          <a class="sgx-btn sgx-btn--solid" data-i18n="venue.gmaps" href="https://www.google.com/maps/search/?api=1&amp;query=41.3282599%2C69.2248441" target="_blank" rel="noreferrer">Google Maps</a>
+          <a class="sgx-btn" data-i18n="venue.ymaps" href="https://yandex.uz/maps/?ll=69.2248441%2C41.3282599&amp;z=17&amp;pt=69.2248441%2C41.3282599%2Cpm2rdm" target="_blank" rel="noreferrer">Yandex xarita</a>
         </div>
       </div>
     </section>
@@ -147,7 +174,7 @@ taklif etamiz</p>
     <!-- GALLERY -->
     <section class="sgx-band sgx-band--soft">
       <div class="sgx-inner sgx-reveal">
-        <h2 class="sgx-script">Xotiralarimiz</h2>
+        <h2 class="sgx-script" data-i18n="gallery.title">Xotiralarimiz</h2>
         <div class="sgx-gallery">
           <figure><img src="./uploads/photo--CN4ofznQ6-W0DFkyJLxS.jpeg" alt="" loading="lazy"></figure>
           <figure><img src="./uploads/photo-mE561IbMunjdHZKCBWCIz.jpg" alt="" loading="lazy"></figure>
@@ -163,45 +190,52 @@ taklif etamiz</p>
       <img class="sgx-vine sgx-vine--bl" src="./sacred/corner-bl.webp" alt="" aria-hidden="true">
       <img class="sgx-vine sgx-vine--br" src="./sacred/corner-br.webp" alt="" aria-hidden="true">
       <div class="sgx-inner sgx-reveal" style="transition-delay: 280ms;">
-        <div class="sgx-note"><h2 class="sgx-script">Kiyim uslubi</h2><p class="sgx-body">Bayramona uslub</p></div>
-        <div class="sgx-note"><h2 class="sgx-script">Sovg'a haqida</h2><p class="sgx-body">Eng qimmatli sovg'a — sizning ishtirokingiz.</p></div>
+        <div class="sgx-note">
+          <h2 class="sgx-script" data-i18n="dress.title">Kiyim uslubi</h2>
+          <p class="sgx-body" data-i18n="dress.text">Bayramona uslub</p>
+        </div>
+        <div class="sgx-note">
+          <h2 class="sgx-script" data-i18n="gift.title">Sovg'a haqida</h2>
+          <p class="sgx-body" data-i18n="gift.text">Eng qimmatli sovg'a — sizning ishtirokingiz.</p>
+        </div>
       </div>
     </section>
 
     <!-- RSVP -->
     <section class="sgx-band sgx-band--cream">
       <div class="sgx-inner sgx-reveal" style="transition-delay: 280ms;">
-        <h2 class="sgx-script">Ishtirokni tasdiqlang</h2>
-        <p class="sgx-body">Bayramga yaxshi tayyorgarlik ko'rishimiz uchun, iltimos, kelishingizni tasdiqlang.</p>
+        <h2 class="sgx-script" data-i18n="rsvp.title">Ishtirokni tasdiqlang</h2>
+        <p class="sgx-body" data-i18n="rsvp.text">Bayramga yaxshi tayyorgarlik ko'rishimiz uchun, iltimos, kelishingizni tasdiqlang.</p>
         <div class="sgx-form">
-          <form class="space-y-6" onsubmit="return false;">
+          <form class="space-y-6" id="rsvp-form">
             <div class="space-y-2">
-              <label class="text-sm leading-none text-[#6c513f] font-medium" for="rsvp-name">Mehmon Ismi</label>
-              <input id="rsvp-name" name="name" placeholder="To'liq ismingizni kiriting" value=""
+              <label class="text-sm leading-none text-[#6c513f] font-medium" for="rsvp-name" data-i18n="rsvp.name">Mehmon Ismi</label>
+              <input id="rsvp-name" name="name" data-i18n-ph="rsvp.namePh" placeholder="To'liq ismingizni kiriting" value=""
                 class="flex h-10 w-full rounded-md border bg-background text-foreground px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm border-gray-300"
                 style="--tw-ring-color: #a67d2b50;">
             </div>
             <div class="space-y-2">
-              <label class="text-sm leading-none text-[#6c513f] font-medium">Qatnashasizmi?</label>
+              <label class="text-sm leading-none text-[#6c513f] font-medium" data-i18n="rsvp.attend">Qatnashasizmi?</label>
               <div role="radiogroup" class="gap-2 flex flex-col space-y-3">
                 <div class="flex items-center space-x-2">
                   <input type="radio" name="attend" id="confirmed" value="confirmed" style="accent-color:#a67d2b;">
-                  <label class="text-sm font-medium leading-none text-[#6c513f]" for="confirmed">Ha, albatta boraman!</label>
+                  <label class="text-sm font-medium leading-none text-[#6c513f]" for="confirmed" data-i18n="rsvp.yes">Ha, albatta boraman!</label>
                 </div>
                 <div class="flex items-center space-x-2">
                   <input type="radio" name="attend" id="declined" value="declined" style="accent-color:#a67d2b;">
-                  <label class="text-sm font-medium leading-none text-[#6c513f]" for="declined">Afsus, kela olmayman</label>
+                  <label class="text-sm font-medium leading-none text-[#6c513f]" for="declined" data-i18n="rsvp.no">Afsus, kela olmayman</label>
                 </div>
               </div>
             </div>
             <div class="space-y-2">
-              <label class="text-sm leading-none text-[#6c513f] font-medium" for="rsvp-msg">Xabar</label>
-              <textarea id="rsvp-msg" name="message" placeholder="Kuyov-kelin bilan xabar ulashing..."
+              <label class="text-sm leading-none text-[#6c513f] font-medium" for="rsvp-msg" data-i18n="rsvp.msg">Xabar</label>
+              <textarea id="rsvp-msg" name="message" data-i18n-ph="rsvp.msgPh" placeholder="Kuyov-kelin bilan xabar ulashing..."
                 class="flex w-full rounded-md border bg-background text-foreground px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 md:text-sm border-gray-300 min-h-[80px]"></textarea>
             </div>
-            <button type="submit"
+            <button type="submit" data-i18n="rsvp.send"
               class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm h-10 px-4 w-full text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               style="background: linear-gradient(to right, rgb(166,125,43), rgb(90,15,27)); border: none;">Javob yuborish</button>
+            <p class="sgx-body" id="rsvp-done" hidden data-i18n="rsvp.done" style="color:#a67d2b;font-size:.95rem;">Rahmat! Javobingiz qabul qilindi.</p>
           </form>
         </div>
       </div>
@@ -210,14 +244,14 @@ taklif etamiz</p>
     <!-- GUESTBOOK -->
     <section class="sgx-band sgx-band--cream">
       <div class="sgx-inner sgx-reveal" style="transition-delay: 280ms;">
-        <h2 class="sgx-script">Tilaklar daftari</h2>
+        <h2 class="sgx-script" data-i18n="wish.title">Tilaklar daftari</h2>
         <div class="sgx-form">
-          <form class="space-y-5" onsubmit="return false;">
+          <form class="space-y-5" id="wish-form">
             <div class="relative group">
               <div class="absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-300 z-10" style="opacity:0.4; color:rgba(0,0,0,0.45);">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
               </div>
-              <input type="text" placeholder="Ismingizni kiriting" required value=""
+              <input type="text" id="wish-name" required value="" data-i18n-ph="wish.namePh" placeholder="Ismingizni kiriting"
                 class="w-full h-14 pl-14 pr-5 rounded-2xl text-base font-light text-gray-900 placeholder:text-gray-500 transition-all duration-300 outline-none"
                 style="background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.15); box-shadow: none;">
             </div>
@@ -225,7 +259,7 @@ taklif etamiz</p>
               <div class="absolute left-4 top-5 transition-all duration-300 z-10" style="opacity:0.4; color:rgba(0,0,0,0.45);">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square w-5 h-5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               </div>
-              <textarea placeholder="Xabaringizni yozing" rows="5" required
+              <textarea id="wish-msg" rows="5" required data-i18n-ph="wish.msgPh" placeholder="Xabaringizni yozing"
                 class="w-full min-h-[140px] pl-14 pr-5 py-5 rounded-2xl text-base font-light text-gray-900 placeholder:text-gray-500 transition-all duration-300 outline-none resize-none"
                 style="background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.15); box-shadow: none; font-family: 'Playfair Display', Georgia, serif;"></textarea>
             </div>
@@ -233,7 +267,7 @@ taklif etamiz</p>
               style="background: linear-gradient(135deg, rgb(166,125,43), rgb(90,15,27)); box-shadow: rgba(166,125,43,0.145) 0px 8px 24px;">
               <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
               <div class="relative flex items-center justify-center gap-2.5">
-                <span class="text-base font-medium text-white tracking-wide">Xabar yuborish</span>
+                <span class="text-base font-medium text-white tracking-wide" data-i18n="wish.send">Xabar yuborish</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send w-5 h-5 text-white transition-transform group-hover:translate-x-1"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>
               </div>
             </button>
@@ -244,19 +278,17 @@ taklif etamiz</p>
             </div>
           </form>
         </div>
-        <!-- Placeholder entries: real guests' messages intentionally not copied -->
-        <ul class="sgx-wishes">
-          <li class="sgx-wish"><p class="sgx-wish__msg">Tilak matni namunasi.</p><p class="sgx-wish__who">— Mehmon 1</p></li>
-          <li class="sgx-wish"><p class="sgx-wish__msg">Tilak matni namunasi.</p><p class="sgx-wish__who">— Mehmon 2</p></li>
-          <li class="sgx-wish"><p class="sgx-wish__msg">Tilak matni namunasi.</p><p class="sgx-wish__who">— Mehmon 3</p></li>
-        </ul>
+
+        <p class="sgx-body wish-empty" id="wish-empty" hidden data-i18n="wish.empty">Hozircha tilaklar yo'q — birinchi bo'ling!</p>
+        <ul class="sgx-wishes" id="wish-list"></ul>
+        <button type="button" class="wish-more" id="wish-more" hidden data-i18n="wish.more">Yana ko'rsatish</button>
       </div>
     </section>
 
     <!-- CLOSING -->
     <section class="sgx-closing">
-      <h2 class="sgx-script sgx-reveal" style="transition-delay: 280ms;">Sizni ko'rishdan baxtiyor bo'lamiz!</h2>
-      <p class="sgx-closing__names">Bunyod va Nazokat</p>
+      <h2 class="sgx-script sgx-reveal" style="transition-delay: 280ms;" data-i18n="closing.text">Sizni ko'rishdan baxtiyor bo'lamiz!</h2>
+      <p class="sgx-closing__names" data-i18n="closing.names">Dilshodbek va Nilufar</p>
     </section>
 
     <footer class="sgx-credit">Taklif Link</footer>
@@ -265,50 +297,221 @@ taklif etamiz</p>
 
 <script>
 (function () {
-  // 1. Envelope open
+  'use strict';
+
+  /* ------------------------------------------------------------------ *
+   * 1. i18n — UZ / RU. Couple names are never translated.
+   * ------------------------------------------------------------------ */
+  var I18N = {
+    uz: {
+      'title':         "Dilshodbek & Nilufar — Taklifnoma",
+      'cover.cta':     "Ochish uchun bosing",
+      'hero.kicker':   "Nikoh kuni",
+      'hero.scroll':   "Pastga suring",
+      'verse.1':       "Ikki qalb",
+      'verse.2':       "Bitta taqdir",
+      'verse.3':       "Alloh yozgan umr",
+      'invite.text':   "Sizni nikoh to'yimiz munosabati bilan\nbo'lib o'tadigan “Visol oqshomiga” ga\ntaklif etamiz",
+      'count.title':   "Bayramgacha qoldi",
+      'count.days':    "Kun",
+      'count.hours':   "Soat",
+      'count.mins':    "Daqiqa",
+      'count.secs':    "Soniya",
+      'sched.title':   "Kun tartibi",
+      'sched.1':       "Mehmonlarni kutib olish",
+      'sched.2':       "Nikoh marosimi",
+      'sched.3':       "Tabriklar",
+      'sched.4':       "Kechki ziyofat",
+      'sched.5':       "Raqs va musiqa",
+      'venue.title':   "Manzil",
+      'venue.name':    "VERSAL to'yxonasi",
+      'venue.address': "Beruniy shoh ko'chasi 8A, Toshkent",
+      'venue.gmaps':   "Google Maps",
+      'venue.ymaps':   "Yandex xarita",
+      'gallery.title': "Xotiralarimiz",
+      'dress.title':   "Kiyim uslubi",
+      'dress.text':    "Bayramona uslub",
+      'gift.title':    "Sovg'a haqida",
+      'gift.text':     "Eng qimmatli sovg'a — sizning ishtirokingiz.",
+      'rsvp.title':    "Ishtirokni tasdiqlang",
+      'rsvp.text':     "Bayramga yaxshi tayyorgarlik ko'rishimiz uchun, iltimos, kelishingizni tasdiqlang.",
+      'rsvp.name':     "Mehmon Ismi",
+      'rsvp.namePh':   "To'liq ismingizni kiriting",
+      'rsvp.attend':   "Qatnashasizmi?",
+      'rsvp.yes':      "Ha, albatta boraman!",
+      'rsvp.no':       "Afsus, kela olmayman",
+      'rsvp.msg':      "Xabar",
+      'rsvp.msgPh':    "Kuyov-kelin bilan xabar ulashing...",
+      'rsvp.send':     "Javob yuborish",
+      'rsvp.done':     "Rahmat! Javobingiz qabul qilindi.",
+      'wish.title':    "Tilaklar daftari",
+      'wish.namePh':   "Ismingizni kiriting",
+      'wish.msgPh':    "Xabaringizni yozing",
+      'wish.send':     "Xabar yuborish",
+      'wish.more':     "Yana ko'rsatish",
+      'wish.empty':    "Hozircha tilaklar yo'q — birinchi bo'ling!",
+      'closing.text':  "Sizni ko'rishdan baxtiyor bo'lamiz!",
+      'closing.names': "Dilshodbek va Nilufar",
+      'bgm.play':      "Musiqani boshlash",
+      'bgm.pause':     "Musiqani to'xtatish"
+    },
+    ru: {
+      'title':         "Dilshodbek & Nilufar — Приглашение",
+      'cover.cta':     "Нажмите, чтобы открыть",
+      'hero.kicker':   "День свадьбы",
+      'hero.scroll':   "Листайте вниз",
+      'verse.1':       "Два сердца",
+      'verse.2':       "Одна судьба",
+      'verse.3':       "Жизнь, начертанная Аллахом",
+      'invite.text':   "Приглашаем вас на «Вечер встречи»,\nкоторый состоится по случаю\nнашего бракосочетания",
+      'count.title':   "До торжества осталось",
+      'count.days':    "Дней",
+      'count.hours':   "Часов",
+      'count.mins':    "Минут",
+      'count.secs':    "Секунд",
+      'sched.title':   "Программа дня",
+      'sched.1':       "Встреча гостей",
+      'sched.2':       "Церемония никоха",
+      'sched.3':       "Поздравления",
+      'sched.4':       "Ужин",
+      'sched.5':       "Танцы и музыка",
+      'venue.title':   "Место проведения",
+      'venue.name':    "Ресторан VERSAL",
+      'venue.address': "ул. Беруний шох, 8А, Ташкент",
+      'venue.gmaps':   "Google Карты",
+      'venue.ymaps':   "Яндекс Карты",
+      'gallery.title': "Наши воспоминания",
+      'dress.title':   "Дресс-код",
+      'dress.text':    "Праздничный стиль",
+      'gift.title':    "О подарках",
+      'gift.text':     "Самый ценный подарок — ваше присутствие.",
+      'rsvp.title':    "Подтвердите участие",
+      'rsvp.text':     "Чтобы мы могли хорошо подготовиться к торжеству, пожалуйста, подтвердите своё присутствие.",
+      'rsvp.name':     "Имя гостя",
+      'rsvp.namePh':   "Введите полное имя",
+      'rsvp.attend':   "Придёте?",
+      'rsvp.yes':      "Да, обязательно буду!",
+      'rsvp.no':       "К сожалению, не смогу",
+      'rsvp.msg':      "Сообщение",
+      'rsvp.msgPh':    "Поделитесь пожеланием с молодожёнами...",
+      'rsvp.send':     "Отправить ответ",
+      'rsvp.done':     "Спасибо! Ваш ответ принят.",
+      'wish.title':    "Книга пожеланий",
+      'wish.namePh':   "Введите ваше имя",
+      'wish.msgPh':    "Напишите ваше пожелание",
+      'wish.send':     "Отправить",
+      'wish.more':     "Показать ещё",
+      'wish.empty':    "Пожеланий пока нет — будьте первым!",
+      'closing.text':  "Будем счастливы видеть вас!",
+      'closing.names': "Dilshodbek и Nilufar",
+      'bgm.play':      "Включить музыку",
+      'bgm.pause':     "Выключить музыку"
+    }
+  };
+
+  var lang = 'uz';
+  try { lang = localStorage.getItem('sgx-lang') || 'uz'; } catch (e) {}
+  if (!I18N[lang]) lang = 'uz';
+
+  function t(key) { return (I18N[lang] && I18N[lang][key]) || I18N.uz[key] || ''; }
+
+  function applyLang() {
+    var d = I18N[lang];
+    document.documentElement.lang = lang;
+    document.title = d['title'];
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var v = d[el.dataset.i18n];
+      if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var v = d[el.dataset.i18nPh];
+      if (v != null) el.placeholder = v;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+      var v = d[el.dataset.i18nAria];
+      if (v != null) el.setAttribute('aria-label', v);
+    });
+    syncPlayerLabel();
+    renderWishes();
+  }
+
+  document.querySelectorAll('.sgx-lang').forEach(function (b) {
+    b.classList.toggle('is-active', b.dataset.lang === lang);
+    b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+    b.addEventListener('click', function () {
+      lang = b.dataset.lang;
+      try { localStorage.setItem('sgx-lang', lang); } catch (e) {}
+      document.querySelectorAll('.sgx-lang').forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle('is-active', on);
+        x.setAttribute('aria-pressed', String(on));
+      });
+      applyLang();
+    });
+  });
+
+  /* ------------------------------------------------------------------ *
+   * 2. Envelope
+   * ------------------------------------------------------------------ */
   var cover = document.getElementById('sgx-cover');
   var main  = document.getElementById('sgx-main');
   var root  = document.querySelector('.sgx');
   var audio = document.getElementById('bgm');
+
   function openCover() {
     if (cover.classList.contains('is-opening')) return;
-    cover.classList.add('is-opening');            // envelope art scales up + fades
-    root.classList.add('sgx--revealed');          // .sgx--revealed .sgx-main { opacity:1 }
+    cover.classList.add('is-opening');      // envelope art scales up + fades
+    root.classList.add('sgx--revealed');    // .sgx--revealed .sgx-main { opacity: 1 }
     document.body.style.overflow = '';
     main.setAttribute('aria-hidden', 'false');
     setTimeout(function () { cover.classList.add('is-gone'); }, 900);
-    if (audio) { audio.volume = 0.5; audio.play().catch(function () {}); }
+    play();
     reveal();
   }
   document.body.style.overflow = 'hidden';
   cover.addEventListener('click', openCover);
-  cover.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') openCover(); });
+  cover.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCover(); }
+  });
 
-  // 2. Scroll reveal (.sgx-reveal -> .is-in)
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
+  /* ------------------------------------------------------------------ *
+   * 3. Scroll reveal
+   * ------------------------------------------------------------------ */
+  /* Rect based on purpose: IntersectionObserver silently never fires in some
+     in-app webviews (Telegram, Instagram) and headless renderers, which would
+     leave every section stuck at opacity: 0. */
+  function reveal() {
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    document.querySelectorAll('.sgx-reveal:not(.is-visible)').forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0) el.classList.add('is-visible');
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-  function reveal() { document.querySelectorAll('.sgx-reveal').forEach(function (el) { io.observe(el); }); }
+  }
+  window.addEventListener('scroll', reveal, { passive: true });
+  window.addEventListener('resize', reveal);
+  window.addEventListener('load', reveal);
   reveal();
 
-  // 3. Countdown to 2026-12-20 18:00 (UTC+5, Tashkent)
+  /* ------------------------------------------------------------------ *
+   * 4. Countdown — 2026-12-20 18:00, UTC+5 (Tashkent)
+   * ------------------------------------------------------------------ */
   var target = new Date('2026-12-20T18:00:00+05:00').getTime();
-  var out = {};
-  document.querySelectorAll('[data-cd]').forEach(function (el) { out[el.dataset.cd] = el; });
+  var cd = {};
+  document.querySelectorAll('[data-cd]').forEach(function (el) { cd[el.dataset.cd] = el; });
   function pad(n) { return String(n).padStart(2, '0'); }
   function tick() {
     var s = Math.floor(Math.max(0, target - Date.now()) / 1000);
-    out.days.textContent  = String(Math.floor(s / 86400));
-    out.hours.textContent = pad(Math.floor(s % 86400 / 3600));
-    out.mins.textContent  = pad(Math.floor(s % 3600 / 60));
-    out.secs.textContent  = pad(s % 60);
+    cd.days.textContent  = String(Math.floor(s / 86400));
+    cd.hours.textContent = pad(Math.floor(s % 86400 / 3600));
+    cd.mins.textContent  = pad(Math.floor(s % 3600 / 60));
+    cd.secs.textContent  = pad(s % 60);
   }
   tick();
   setInterval(tick, 1000);
 
-  // 4. Schedule: rose travelling down the spine (CSS vars read by .sgx-sched__rose/__trail)
+  /* ------------------------------------------------------------------ *
+   * 5. Schedule: rose travelling down the spine
+   * ------------------------------------------------------------------ */
   var wrap = document.getElementById('sgx-sched-wrap');
   function measure() {
     var rows = wrap.querySelectorAll('.sgx-sched__row');
@@ -330,25 +533,103 @@ taklif etamiz</p>
     wrap.style.setProperty('--sgx-rose-y', (top + span * p) + 'px');
     wrap.style.setProperty('--sgx-rose-len', (span * p) + 'px');
   }
-  window.addEventListener('load', function () { measure(); trail(); });
+  window.addEventListener('load',   function () { measure(); trail(); });
   window.addEventListener('resize', function () { measure(); trail(); });
   window.addEventListener('scroll', trail, { passive: true });
   measure();
 
-  // 5. Music toggle
-  document.getElementById('bgm-btn').addEventListener('click', function () {
-    if (audio.paused) { audio.play().catch(function () {}); } else { audio.pause(); }
+  /* ------------------------------------------------------------------ *
+   * 6. Music player: play/pause icon + equalizer bars while playing
+   * ------------------------------------------------------------------ */
+  var btn      = document.getElementById('bgm-btn');
+  var iconPlay = document.getElementById('bgm-icon-play');
+  var bars     = document.getElementById('bgm-bars');
+
+  function syncPlayerLabel() {
+    btn.setAttribute('aria-label', audio.paused ? t('bgm.play') : t('bgm.pause'));
+  }
+  function syncPlayer() {
+    var on = !audio.paused;
+    iconPlay.hidden = on;                 // playing -> equalizer, stopped -> triangle
+    bars.classList.toggle('is-on', on);
+    syncPlayerLabel();
+  }
+  function play() { audio.volume = 0.5; var p = audio.play(); if (p) p.catch(function () {}); }
+  btn.addEventListener('click', function () { if (audio.paused) { play(); } else { audio.pause(); } });
+  ['play', 'pause', 'ended'].forEach(function (ev) { audio.addEventListener(ev, syncPlayer); });
+  syncPlayer();
+
+  /* ------------------------------------------------------------------ *
+   * 7. Guestbook: submit adds an entry, entries persist and load in pages
+   * ------------------------------------------------------------------ */
+  var STORE = 'sgx-wishes';
+  var PAGE  = 3;
+  var listEl  = document.getElementById('wish-list');
+  var moreEl  = document.getElementById('wish-more');
+  var emptyEl = document.getElementById('wish-empty');
+  var shown   = PAGE;
+
+  function loadWishes() {
+    try { return JSON.parse(localStorage.getItem(STORE)) || []; }
+    catch (e) { return []; }
+  }
+  function saveWishes(list) {
+    try { localStorage.setItem(STORE, JSON.stringify(list)); } catch (e) {}
+  }
+
+  function renderWishes(freshId) {
+    var all = loadWishes();
+    listEl.textContent = '';
+    emptyEl.hidden = all.length > 0;
+
+    all.slice(0, shown).forEach(function (w) {
+      var li = document.createElement('li');
+      li.className = 'sgx-wish' + (w.id === freshId ? ' sgx-wish--new' : '');
+      var msg = document.createElement('p');
+      msg.className = 'sgx-wish__msg';
+      msg.textContent = w.msg;                    // textContent -> no HTML injection
+      var who = document.createElement('p');
+      who.className = 'sgx-wish__who';
+      who.textContent = '— ' + w.name;
+      li.appendChild(msg);
+      li.appendChild(who);
+      listEl.appendChild(li);
+    });
+
+    moreEl.hidden = all.length <= shown;
+    moreEl.textContent = t('wish.more') + ' (' + Math.max(0, all.length - shown) + ')';
+  }
+
+  moreEl.addEventListener('click', function () { shown += PAGE; renderWishes(); });
+
+  document.getElementById('wish-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nameEl = document.getElementById('wish-name');
+    var msgEl  = document.getElementById('wish-msg');
+    var name = nameEl.value.trim();
+    var msg  = msgEl.value.trim();
+    if (!name || !msg) return;
+
+    var id  = Date.now();
+    var all = loadWishes();
+    all.unshift({ id: id, name: name, msg: msg, at: new Date().toISOString() });
+    saveWishes(all);
+
+    nameEl.value = '';
+    msgEl.value  = '';
+    renderWishes(id);
+    if (listEl.firstElementChild) {
+      listEl.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   });
 
-  // 6. Language switch (visual only - this static copy ships the UZ strings)
-  document.querySelectorAll('.sgx-lang').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('.sgx-lang').forEach(function (x) {
-        x.classList.remove('is-active'); x.setAttribute('aria-pressed', 'false');
-      });
-      b.classList.add('is-active'); b.setAttribute('aria-pressed', 'true');
-    });
+  /* RSVP — no backend in this static copy, so just acknowledge */
+  document.getElementById('rsvp-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    document.getElementById('rsvp-done').hidden = false;
   });
+
+  applyLang();
 })();
 </script>
 </body>
