@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <meta name="theme-color" content="#1e3a8a">
+  <link rel="stylesheet" href="./assets/index.css">
+  <title>Dilshodbek &amp; Nilufarxon — Taklifnoma</title>
+  <style>
+    /* The UA [hidden] rule does not reliably reach SVG elements, so state the
+       rule explicitly - without it the play triangle stays on screen while the
+       track is running. */
+    [hidden] { display: none !important; }
+    /* `hidden` is an HTMLElement property - SVGElement does not have it, so
+       assigning svg.hidden only makes a JS expando and never touches the
+       attribute. Drive the icons with a class instead. */
+    #bgm-btn .bgm-ico { display: none; }
+    #bgm-btn .bgm-ico.is-on { display: block; }
+    /* equalizer bars for the music button (matches the original bundle) */
+    @keyframes azamatBar { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
+    .bgm-bars { display: none; align-items: flex-end; gap: 3px; height: 20px; }
+    .bgm-bars.is-on { display: flex; }
+    .bgm-bars span {
+      width: 3px; border-radius: 999px; transform-origin: bottom;
+      background: linear-gradient(to top, #5a0f1b, #b48c3d);
+      animation-name: azamatBar; animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite; animation-direction: alternate;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bgm-bars span { animation: none; transform: scaleY(.7); }
+    }
+  </style>
+</head>
+<body>
+<div id="root"><div class="sgx ">
+
+  <audio id="bgm" src="./uploads/music-evlenelim-bu-yaz.m4a" preload="auto" loop playsinline></audio>
+
+  <!-- MUSIC PLAYER -->
+  <div class="fixed bottom-20 right-4 z-[130] flex items-center gap-2 select-none">
+    <button type="button" id="bgm-btn" data-i18n-aria="bgm.play" aria-label="Musiqani boshlash"
+      class="w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-150 active:scale-90 focus:outline-none"
+      style="background: linear-gradient(135deg, rgb(90,15,27) 0%, rgb(166,125,43) 100%); box-shadow: rgba(166,125,43,0.45) 0px 2px 12px;">
+      <svg id="bgm-icon-play" class="bgm-ico is-on" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 1.5L12.5 8L2 14.5V1.5Z" fill="#f9f0e0"></path>
+      </svg>
+      <svg id="bgm-icon-pause" class="bgm-ico" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="4" height="14" rx="1.5" fill="#f9f0e0"></rect>
+        <rect x="9" y="1" width="4" height="14" rx="1.5" fill="#f9f0e0"></rect>
+      </svg>
+    </button>
+    <div class="bgm-bars" id="bgm-bars" aria-hidden="true">
+      <span style="height:60%;  animation-duration:.55s; animation-delay:0s;"></span>
+      <span style="height:100%; animation-duration:.65s; animation-delay:.08s;"></span>
+      <span style="height:75%;  animation-duration:.75s; animation-delay:.16s;"></span>
+      <span style="height:100%; animation-duration:.85s; animation-delay:.24s;"></span>
+      <span style="height:50%;  animation-duration:.95s; animation-delay:.32s;"></span>
+    </div>
+  </div>
+
+  <nav class="sgx-langs" aria-label="Language">
+    <button type="button" class="sgx-lang is-active" data-lang="uz" aria-pressed="true">UZ</button>
+    <button type="button" class="sgx-lang" data-lang="ru" aria-pressed="false">RU</button>
+  </nav>
+
+  <!-- ENVELOPE / COVER -->
+  <div class="sgx-cover" id="sgx-cover" role="button" tabindex="0" data-i18n-aria="cover.cta" aria-label="Ochish uchun bosing">
+    <div class="sgx-cover__art">
+      <div class="sgx-cover__seal">
+        <span class="sgx-mono"><span class="sgx-mono__letter">D</span><span class="sgx-mono__amp">&amp;</span><span class="sgx-mono__letter">N</span></span>
+      </div>
+      <p class="sgx-cover__cta">
+        <span class="sgx-cover__chev" aria-hidden="true">︿</span>
+        <span class="sgx-cover__label" data-i18n="cover.cta">Ochish uchun bosing</span>
+      </p>
+    </div>
+  </div>
+
+  <main class="sgx-main" id="sgx-main" aria-hidden="true">
+
+    <!-- HERO -->
+    <section class="sgx-hero">
+      <div class="sgx-hero__monogram" aria-hidden="true">
+        <span class="sgx-mono"><span class="sgx-mono__letter">D</span><span class="sgx-mono__amp">&amp;</span><span class="sgx-mono__letter">N</span></span>
+      </div>
+      <p class="sgx-hero__kicker" data-i18n="hero.kicker">Nikoh kuni</p>
+      <p class="sgx-hero__date"><span>17.10.26</span><span class="sgx-hero__time">18:00</span></p>
+      <!-- names are never translated -->
+      <h1 class="sgx-hero__names">
+        <span class="sgx-hero__name">Dilshodbek</span><span class="sgx-hero__amp">&amp;</span><span class="sgx-hero__name">Nilufarxon</span>
+      </h1>
+      <a class="sgx-scroll" href="#sgx-blessing">
+        <span class="sgx-scroll__text" data-i18n="hero.scroll">Pastga suring</span>
+        <span class="sgx-scroll__chev" aria-hidden="true">﹀</span>
+      </a>
+      <img class="sgx-bouquet sgx-bouquet--l" src="./sacred/bouquet-left.webp" alt="" aria-hidden="true">
+      <img class="sgx-bouquet sgx-bouquet--r" src="./sacred/bouquet-right.webp" alt="" aria-hidden="true">
+    </section>
+
+    <!-- BLESSING -->
+    <section class="sgx-band sgx-band--paper" id="sgx-blessing">
+      <img class="sgx-vine sgx-vine--tl" src="./sacred/corner-tl.webp" alt="" aria-hidden="true">
+      <img class="sgx-vine sgx-vine--tr" src="./sacred/corner-tr.webp" alt="" aria-hidden="true">
+      <div class="sgx-inner sgx-reveal" style="transition-delay: 0ms;">
+        <p class="sgx-basmala">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
+        <div class="sgx-verse">
+          <span data-i18n="verse.1">Ikki qalb</span>
+          <span data-i18n="verse.2">Bitta taqdir</span>
+          <span data-i18n="verse.3">Alloh yozgan umr</span>
+        </div>
+        <p class="sgx-body" style="white-space: pre-line;" data-i18n="invite.text">Sizni nikoh to'yimiz munosabati bilan
+bo'lib o'tadigan "Visol oqshomiga" ga
+taklif etamiz</p>
+      </div>
+    </section>
+
+    <!-- COUNTDOWN -->
+    <section class="sgx-band sgx-band--cream">
+      <div class="sgx-inner sgx-reveal" style="transition-delay: 70ms;">
+        <h2 class="sgx-script" data-i18n="count.title">Bayramgacha qoldi</h2>
+        <div class="sgx-count" id="sgx-count" role="timer" aria-live="polite">
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="days">0</span><span class="sgx-count__lbl" data-i18n="count.days">Kun</span></div>
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="hours">00</span><span class="sgx-count__lbl" data-i18n="count.hours">Soat</span></div>
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="mins">00</span><span class="sgx-count__lbl" data-i18n="count.mins">Daqiqa</span></div>
+          <div class="sgx-count__cell"><span class="sgx-count__num" data-cd="secs">00</span><span class="sgx-count__lbl" data-i18n="count.secs">Soniya</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section class="sgx-band sgx-band--paper">
+      <div class="sgx-inner sgx-reveal" style="transition-delay: 140ms;">
+        <div class="sgx-sched-head">
+          <img src="./sacred/flourish-left.webp" alt="" aria-hidden="true">
+          <h2 class="sgx-script" data-i18n="sched.title">Kun tartibi</h2>
+          <img src="./sacred/flourish-right.webp" alt="" aria-hidden="true">
+        </div>
+        <div class="sgx-sched-wrap" id="sgx-sched-wrap">
+          <ol class="sgx-sched">
+            <li class="sgx-sched__row"><span class="sgx-sched__time">18:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.1">Mehmonlarni kutib olish</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">19:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.2">Nikoh marosimi</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">20:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.3">Tabriklar</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">21:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.4">Kechki ziyofat</span></li>
+            <li class="sgx-sched__row"><span class="sgx-sched__time">22:00</span><span class="sgx-sched__node" aria-hidden="true"></span><span class="sgx-sched__label" data-i18n="sched.5">Raqs va musiqa</span></li>
+          </ol>
+          <span class="sgx-sched__spine" aria-hidden="true"></span>
+          <span class="sgx-sched__trail" aria-hidden="true"></span>
+          <span class="sgx-sched__rose" aria-hidden="true"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- VENUE -->
+    <section class="sgx-band sgx-band--cream">
+      <img class="sgx-petal sgx-petal--a" src="./sacred/petal-3061.webp" alt="" aria-hidden="true">
+      <img class="sgx-petal sgx-petal--b" src="./sacred/petal-3164.webp" alt="" aria-hidden="true">
+      <img class="sgx-petal sgx-petal--c" src="./sacred/petal-3865.webp" alt="" aria-hidden="true">
+      <img class="sgx-petal sgx-petal--d" src="./sacred/petal-3162.webp" alt="" aria-hidden="true">
+      <img class="sgx-petal sgx-petal--e" src="./sacred/petal-3138.webp" alt="" aria-hidden="true">
+      <img class="sgx-petal sgx-petal--f" src="./sacred/petal-3034.webp" alt="" aria-hidden="true">
+      <div class="sgx-inner sgx-reveal" style="transition-delay: 210ms;">
+        <h2 class="sgx-script" data-i18n="venue.title">Manzil</h2>
+        <img class="sgx-divider" src="./sacred/divider.webp" alt="" aria-hidden="true">
+        <p class="sgx-venue" data-i18n="venue.name">Sherbudin</p>
+        <p class="sgx-address" data-i18n="venue.address">Bahouddin Naqshband ko'chasi, Buxoro</p>
+        <div class="sgx-maps">
+          <a class="sgx-btn sgx-btn--solid" data-i18n="venue.gmaps" href="https://maps.app.goo.gl/t6YsHLS7ZiYujp7c8" target="_blank" rel="noreferrer">Google Maps</a>
+          <a class="sgx-btn" data-i18n="venue.ymaps" href="https://yandex.ru/maps/org/sherbudin/198231596322?si=rv7twvc2eh8g4ke2fp9bwq48rm" target="_blank" rel="noreferrer">Yandex xarita</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section class="sgx-band sgx-band--paper">
+      <img class="sgx-vine sgx-vine--tr" src="./sacred/corner-tr.webp" alt="" aria-hidden="true">
+      <img class="sgx-vine sgx-vine--bl" src="./sacred/corner-bl.webp" alt="" aria-hidden="true">
+      <img class="sgx-vine sgx-vine--br" src="./sacred/corner-br.webp" alt="" aria-hidden="true">
+      <div class="sgx-inner sgx-reveal" style="transition-delay: 280ms;">
+        <div class="sgx-note">
+          <h2 class="sgx-script" data-i18n="dress.title">Kiyim uslubi</h2>
+          <p class="sgx-body" data-i18n="dress.text">Bayramona uslub</p>
+        </div>
+        <div class="sgx-note">
+          <h2 class="sgx-script" data-i18n="gift.title">Sovg'a haqida</h2>
+          <p class="sgx-body" data-i18n="gift.text">Eng qimmatli sovg'a — sizning ishtirokingiz.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSING -->
+    <section class="sgx-closing">
+      <h2 class="sgx-script sgx-reveal" style="transition-delay: 280ms;" data-i18n="closing.text">Sizni ko'rishdan baxtiyor bo'lamiz!</h2>
+      <p class="sgx-closing__names" data-i18n="closing.names">Dilshodbek va Nilufarxon</p>
+    </section>
+
+    <footer class="sgx-credit">Taklif Link</footer>
+  </main>
+</div></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ------------------------------------------------------------------ *
+   * 1. i18n — UZ / RU. Couple names are never translated.
+   * ------------------------------------------------------------------ */
+  var I18N = {
+    uz: {
+      'title':         "Dilshodbek & Nilufarxon — Taklifnoma",
+      'cover.cta':     "Ochish uchun bosing",
+      'hero.kicker':   "Nikoh kuni",
+      'hero.scroll':   "Pastga suring",
+      'verse.1':       "Ikki qalb",
+      'verse.2':       "Bitta taqdir",
+      'verse.3':       "Alloh yozgan umr",
+      'invite.text':   "Sizni nikoh to'yimiz munosabati bilan\nbo'lib o'tadigan “Visol oqshomiga” ga\ntaklif etamiz",
+      'count.title':   "Bayramgacha qoldi",
+      'count.days':    "Kun",
+      'count.hours':   "Soat",
+      'count.mins':    "Daqiqa",
+      'count.secs':    "Soniya",
+      'sched.title':   "Kun tartibi",
+      'sched.1':       "Mehmonlarni kutib olish",
+      'sched.2':       "Nikoh marosimi",
+      'sched.3':       "Tabriklar",
+      'sched.4':       "Kechki ziyofat",
+      'sched.5':       "Raqs va musiqa",
+      'venue.title':   "Manzil",
+      'venue.name':    "Sherbudin",
+      'venue.address': "Bahouddin Naqshband ko'chasi, Buxoro",
+      'venue.gmaps':   "Google Maps",
+      'venue.ymaps':   "Yandex xarita",
+      'dress.title':   "Kiyim uslubi",
+      'dress.text':    "Bayramona uslub",
+      'gift.title':    "Sovg'a haqida",
+      'gift.text':     "Eng qimmatli sovg'a — sizning ishtirokingiz.",
+      'closing.text':  "Sizni ko'rishdan baxtiyor bo'lamiz!",
+      'closing.names': "Dilshodbek va Nilufarxon",
+      'bgm.play':      "Musiqani boshlash",
+      'bgm.pause':     "Musiqani to'xtatish"
+    },
+    ru: {
+      'title':         "Dilshodbek & Nilufarxon — Приглашение",
+      'cover.cta':     "Нажмите, чтобы открыть",
+      'hero.kicker':   "День свадьбы",
+      'hero.scroll':   "Листайте вниз",
+      'verse.1':       "Два сердца",
+      'verse.2':       "Одна судьба",
+      'verse.3':       "Жизнь, начертанная Аллахом",
+      'invite.text':   "Приглашаем вас на «Вечер встречи»,\nкоторый состоится по случаю\nнашего бракосочетания",
+      'count.title':   "До торжества осталось",
+      'count.days':    "Дней",
+      'count.hours':   "Часов",
+      'count.mins':    "Минут",
+      'count.secs':    "Секунд",
+      'sched.title':   "Программа дня",
+      'sched.1':       "Встреча гостей",
+      'sched.2':       "Церемония никоха",
+      'sched.3':       "Поздравления",
+      'sched.4':       "Ужин",
+      'sched.5':       "Танцы и музыка",
+      'venue.title':   "Место проведения",
+      'venue.name':    "Sherbudin",
+      'venue.address': "ул. Бахоуддина Накшбанда, Бухара",
+      'venue.gmaps':   "Google Карты",
+      'venue.ymaps':   "Яндекс Карты",
+      'dress.title':   "Дресс-код",
+      'dress.text':    "Праздничный стиль",
+      'gift.title':    "О подарках",
+      'gift.text':     "Самый ценный подарок — ваше присутствие.",
+      'closing.text':  "Будем счастливы видеть вас!",
+      'closing.names': "Dilshodbek и Nilufarxon",
+      'bgm.play':      "Включить музыку",
+      'bgm.pause':     "Выключить музыку"
+    }
+  };
+
+  var lang = 'uz';
+  try { lang = localStorage.getItem('sgx-lang') || 'uz'; } catch (e) {}
+  if (!I18N[lang]) lang = 'uz';
+
+  function t(key) { return (I18N[lang] && I18N[lang][key]) || I18N.uz[key] || ''; }
+
+  function applyLang() {
+    var d = I18N[lang];
+    document.documentElement.lang = lang;
+    document.title = d['title'];
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var v = d[el.dataset.i18n];
+      if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var v = d[el.dataset.i18nPh];
+      if (v != null) el.placeholder = v;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+      var v = d[el.dataset.i18nAria];
+      if (v != null) el.setAttribute('aria-label', v);
+    });
+    syncPlayerLabel();
+  }
+
+  document.querySelectorAll('.sgx-lang').forEach(function (b) {
+    b.classList.toggle('is-active', b.dataset.lang === lang);
+    b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+    b.addEventListener('click', function () {
+      lang = b.dataset.lang;
+      try { localStorage.setItem('sgx-lang', lang); } catch (e) {}
+      document.querySelectorAll('.sgx-lang').forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle('is-active', on);
+        x.setAttribute('aria-pressed', String(on));
+      });
+      applyLang();
+    });
+  });
+
+  /* ------------------------------------------------------------------ *
+   * 2. Envelope
+   * ------------------------------------------------------------------ */
+  var cover = document.getElementById('sgx-cover');
+  var main  = document.getElementById('sgx-main');
+  var root  = document.querySelector('.sgx');
+  var audio = document.getElementById('bgm');
+
+  function openCover() {
+    if (cover.classList.contains('is-opening')) return;
+    cover.classList.add('is-opening');      // envelope art scales up + fades
+    root.classList.add('sgx--revealed');    // .sgx--revealed .sgx-main { opacity: 1 }
+    document.body.style.overflow = '';
+    main.setAttribute('aria-hidden', 'false');
+    setTimeout(function () { cover.classList.add('is-gone'); }, 900);
+    play();
+    reveal();
+  }
+  document.body.style.overflow = 'hidden';
+  cover.addEventListener('click', openCover);
+  cover.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCover(); }
+  });
+
+  /* ------------------------------------------------------------------ *
+   * 3. Scroll reveal
+   * ------------------------------------------------------------------ */
+  /* Rect based on purpose: IntersectionObserver silently never fires in some
+     in-app webviews (Telegram, Instagram) and headless renderers, which would
+     leave every section stuck at opacity: 0. */
+  function reveal() {
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    document.querySelectorAll('.sgx-reveal:not(.is-visible)').forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0) el.classList.add('is-visible');
+    });
+  }
+  window.addEventListener('scroll', reveal, { passive: true });
+  window.addEventListener('resize', reveal);
+  window.addEventListener('load', reveal);
+  reveal();
+
+  /* ------------------------------------------------------------------ *
+   * 4. Countdown — 2026-10-17 18:00, UTC+5 (Buxoro)
+   * ------------------------------------------------------------------ */
+  var target = new Date('2026-10-17T18:00:00+05:00').getTime();
+  var cd = {};
+  document.querySelectorAll('[data-cd]').forEach(function (el) { cd[el.dataset.cd] = el; });
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function tick() {
+    var s = Math.floor(Math.max(0, target - Date.now()) / 1000);
+    cd.days.textContent  = String(Math.floor(s / 86400));
+    cd.hours.textContent = pad(Math.floor(s % 86400 / 3600));
+    cd.mins.textContent  = pad(Math.floor(s % 3600 / 60));
+    cd.secs.textContent  = pad(s % 60);
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  /* ------------------------------------------------------------------ *
+   * 5. Schedule: rose travelling down the spine
+   * ------------------------------------------------------------------ */
+  var wrap = document.getElementById('sgx-sched-wrap');
+  function measure() {
+    var rows = wrap.querySelectorAll('.sgx-sched__row');
+    if (!rows.length) return;
+    var wt = wrap.getBoundingClientRect().top;
+    var first = rows[0].querySelector('.sgx-sched__node').getBoundingClientRect();
+    var last  = rows[rows.length - 1].querySelector('.sgx-sched__node').getBoundingClientRect();
+    var top  = first.top + first.height / 2 - wt;
+    var span = (last.top + last.height / 2 - wt) - top;
+    wrap.style.setProperty('--sgx-rose-top', top + 'px');
+    wrap.style.setProperty('--sgx-rose-span', span + 'px');
+  }
+  function trail() {
+    var r = wrap.getBoundingClientRect();
+    var p = Math.min(1, Math.max(0, (window.innerHeight * 0.75 - r.top) / r.height));
+    var cs = getComputedStyle(wrap);
+    var span = parseFloat(cs.getPropertyValue('--sgx-rose-span')) || 0;
+    var top  = parseFloat(cs.getPropertyValue('--sgx-rose-top')) || 0;
+    wrap.style.setProperty('--sgx-rose-y', (top + span * p) + 'px');
+    wrap.style.setProperty('--sgx-rose-len', (span * p) + 'px');
+  }
+  window.addEventListener('load',   function () { measure(); trail(); });
+  window.addEventListener('resize', function () { measure(); trail(); });
+  window.addEventListener('scroll', trail, { passive: true });
+  measure();
+
+  /* ------------------------------------------------------------------ *
+   * 6. Music player: play/pause icon + equalizer bars while playing
+   * ------------------------------------------------------------------ */
+  var btn      = document.getElementById('bgm-btn');
+  var iconPlay = document.getElementById('bgm-icon-play');
+  var iconStop = document.getElementById('bgm-icon-pause');
+  var bars     = document.getElementById('bgm-bars');
+
+  function syncPlayerLabel() {
+    btn.setAttribute('aria-label', audio.paused ? t('bgm.play') : t('bgm.pause'));
+  }
+  function syncPlayer() {
+    var on = !audio.paused;
+    iconPlay.classList.toggle('is-on', !on);  // stopped -> triangle in the button
+    iconStop.classList.toggle('is-on', on);   // playing -> pause bars in the button
+    bars.classList.toggle('is-on', on);       // ...plus the equalizer beside it
+    syncPlayerLabel();
+  }
+  function play() { audio.volume = 0.5; var p = audio.play(); if (p) p.catch(function () {}); }
+  btn.addEventListener('click', function () { if (audio.paused) { play(); } else { audio.pause(); } });
+  ['play', 'pause', 'ended'].forEach(function (ev) { audio.addEventListener(ev, syncPlayer); });
+  syncPlayer();
+
+  applyLang();
+})();
+</script>
+</body>
+</html>
